@@ -1,0 +1,45 @@
+version: "3.8"
+
+services:
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - user-service
+      - product-service
+
+  user-service:
+    build: ./user-service
+    ports:
+      - "3001:3001"
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/fragz-users
+    depends_on:
+      - mongo
+      - redis
+
+  product-service:
+    build: ./product-service
+    ports:
+      - "3002:3002"
+    environment:
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - redis
+
+  mongo:
+    image: mongo:6
+    volumes:
+      - mongo-data: /data/db
+
+  redis:
+    image: redis:7
+    volumes:
+      - redis-data: /data
+
+volumes:
+  mongo-data:
+  redis-data:
